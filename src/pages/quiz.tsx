@@ -1,48 +1,106 @@
-import Head from 'next/head'
-import { useState } from 'react'
+import Link from 'next/link';
+import { useRouter } from 'next/router'
+import { useState, useEffect, useRef } from 'react'
 import useSWR from 'swr'
+import styles from '../styles/Quiz.module.css'
 
 export default function Quiz() {
+  const router = useRouter()
+  const Ref = useRef(null);
+  const [timer, setTimer] = useState('00:05:00');
+
+  const getTimeRemaining = (e) => {
+    const total = Date.parse(e) - Date.parse(new Date());
+    const seconds = Math.floor((total / 1000) % 60);
+    const minutes = Math.floor((total / 1000 / 60) % 60);
+    const hours = Math.floor((total / 1000 / 60 / 60) % 24);
+    return {
+      total, hours, minutes, seconds
+    };
+  }
+
+  const startTimer = (e) => {
+    let { total, hours, minutes, seconds }
+      = getTimeRemaining(e);
+    if (total >= 0) {
+      setTimer(
+        (hours > 9 ? hours : '0' + hours) + ':' +
+        (minutes > 9 ? minutes : '0' + minutes) + ':'
+        + (seconds > 9 ? seconds : '0' + seconds)
+      )
+    }
+  }
+
+  const clearTimer = (e) => {
+    setTimer('00:05:00');
+    if (Ref.current) clearInterval(Ref.current);
+    const id = setInterval(() => {
+      startTimer(e);
+    }, 1000)
+    Ref.current = id;
+  }
+
+  const getDeadTime = () => {
+    let deadline = new Date();
+    deadline.setSeconds(deadline.getSeconds() + 300);
+    return deadline;
+  }
+
+  useEffect(() => {
+    clearTimer(getDeadTime());
+  }, []);
+
   const [pageIndex, setPageIndex] = useState(0);
-  const fetcher = (...args) => fetch(...args).then(res => res.json())
+  const [answered, setAnswered] = useState({});
+  const fetcher = (...args: any) => fetch(...args).then(res => res.json())
 
   const { data, error } = useSWR(`http://localhost:3000/api/quiz?page=${pageIndex}`, fetcher)
   if (error) return <div>failed to load</div>
   if (!data) return <div>loading...</div>
 
-  console.log('pageIndex', pageIndex);
-  console.log('data', data);
-  const quiz = data.quiz;
+  const { quiz, next, prev } = data;
+
+  const addAnswer = (e: React.FormEvent<HTMLInputElement>): void => {
+    const { name, value } = e.target;
+    const latestAnswers = { ...answered, [name]: value };
+    setAnswered(latestAnswers);
+    window.localStorage.setItem("quiz", JSON.stringify(latestAnswers));
+  }
+
+  if (timer === '00:00:00') {
+    router.push('/result')
+  }
 
   return (
-    <div className="container">
-      <Head>
-        <title>Qiuz App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main>
-        <h1 className="title">
-          Welcome to Quiz
-        </h1>
-        <div>
-          <div key={quiz.id}>
+    <>
+      <h2>{timer}</h2>
+      <div>
+        <div key={quiz.id}>
           <p>{quiz.question}</p>
-          </div>
         </div>
-        {data.prev && <button onClick={() => setPageIndex(pageIndex - 1)}>Previous Question</button>}
-        {data.next && <button onClick={() => setPageIndex(pageIndex + 1)}>Next Question</button>}
-      </main>
-
-      <footer>
-        <a
-          href="https://dinakajoy.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Odinaka Joy
-        </a>
-      </footer>
-    </div>
+        <ul>
+          {quiz.options.map((option: string, i: number) => (
+            <li className={styles.option} key={i}><input type="radio" name={quiz.id.toString()} onChange={addAnswer} value={option} checked={answered[quiz.id] === option} />{option}</li>
+          ))}
+        </ul>
+      </div>
+      <div className={styles.navBtns}>
+        {prev ? (
+          <button onClick={() => setPageIndex(pageIndex - 1)}>Previous Question</button>
+        ) : (
+          <Link href="/">
+            <a>Cancel</a>
+          </Link>
+        )}
+        {next ? (
+          <button onClick={() => setPageIndex(pageIndex + 1)} disabled={answered[quiz.id] === undefined} className={answered[quiz.id] === undefined ? 'disabledBtn' : 'activeBtn'}>Next Question</button>
+        ) : (
+          answered[quiz.id] !== undefined && (
+            <Link href="/result">
+              <a>Finish</a>
+            </Link>
+          ))}
+      </div>
+    </>
   )
 }

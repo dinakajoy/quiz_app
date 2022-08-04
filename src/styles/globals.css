@@ -6,13 +6,51 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
+* {
+  box-sizing: border-box;
+}
+
 a {
   color: inherit;
   text-decoration: none;
 }
 
-* {
-  box-sizing: border-box;
+.title {
+  text-align: center;
+  text-decoration: underline;
+}
+
+.main {
+  margin: 20px auto;
+  width: 95%;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.footer {
+  display: flex;
+  flex: 1;
+  padding: 2rem 0;
+  border-top: 1px solid #eaeaea;
+  justify-content: center;
+  align-items: center;
+  font-size: 13px;
+}
+
+.footer a {
+  background-color: #535455fa;
+  padding: 2px;
+  border-radius: 5px;
+}
+
+.activeBtn {
+  cursor: pointer !important;
+}
+
+.disabledBtn {
+  cursor: none !important;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,5 +60,22 @@ a {
   body {
     color: white;
     background: black;
+  }
+  .footer {
+    border-color: #222;
+  }
+}
+
+@media (min-width: 500px) {
+  .main {
+    margin: 35px auto;
+    width: 80%;
+  }
+}
+
+@media (min-width: 880px) {
+  .main {
+    margin: 50px auto;
+    width: 60%;
   }
 }

@@ -1,13 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
+import { TQuiz } from '../../types/quiz';
 
-type Quiz = {
-  id: number,
-  question: string,
-  options: string[],
-  answer: string
-}
-
-const questionsAndAnswers: Quiz[] = [
+const questionsAndAnswers: TQuiz[] = [
   {
     id: 1,
     question: "Whch Programming Language is best for writing System Programs",
@@ -40,14 +34,14 @@ interface Params {
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<{prev: boolean, next: boolean, page: string, quiz: Quiz}>
+  res: NextApiResponse<{ prev: boolean, next: boolean, page: string, quiz: TQuiz } | TQuiz[]>
 ) {
   try {
     let { page } = req.query as unknown as Params;
 
     // If the page is not applied in query.
     if (!page) {
-      page = "0";
+      res.send(questionsAndAnswers);
     }
 
     let pageToNum = parseInt(page);
@@ -55,7 +49,7 @@ export default function handler(
     const quiz = questionsAndAnswers[pageToNum];
     const lastPage = questionsAndAnswers.length - 1;
 
-    if(pageToNum === 0) {
+    if (pageToNum === 0) {
       res.send({
         prev: false,
         next: true,

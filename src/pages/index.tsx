@@ -1,33 +1,16 @@
-import Head from 'next/head'
 import Link from 'next/link'
+import styles from '../styles/Home.module.css'
 
 export default function Home() {
   return (
-    <div className="container">
-      <Head>
-        <title>Qiuz App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-
-      <main>
-        <h1 className="title">
-          Welcome to Quiz
-        </h1>
-        <p>You have four options to choose one. The quiz takes ten minutes to complete. Failure to finish in ten minutes means you have failed. Results will be displayed once you submit or once the quiz times out</p>
-        <Link href="/quiz">
-          <a>Start Quiz</a>
-        </Link>
-      </main>
-
-      <footer>
-        <a
-          href="https://dinakajoy.com/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Odinaka Joy
-        </a>
-      </footer>
+    <div className={styles.homeWrapper}>
+      <p className={styles.description}>Welcome &nbsp; 👋</p>
+      <p className={styles.description}>This is a programming quiz to test your knowledge on basic programming concepts, fundamentals of computer science and software engineering. You can retake as many time as you desire.</p>
+      <p className={styles.description}>You have four options to choose one. The quiz takes   minutes to complete. Results will be displayed once you submit or once the quiz times out.</p>
+      <p className={styles.description}>Goodluck!!! &nbsp; 💪🏻 &nbsp; 💪🏻 &nbsp; 💪🏻</p>
+      <Link href="/quiz">
+        <a className={styles.startBtn}>Start Quiz</a>
+      </Link>
     </div>
   )
 }
