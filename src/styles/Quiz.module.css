@@ -1,3 +1,11 @@
+.info {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
 .centered {
   display: flex;
   flex-direction: column;
@@ -54,4 +62,21 @@
 
 .ul {
   margin-top: -10px;
+}
+
+.finish {
+  text-align: center;
+  background-color: #045822;
+  color: rgb(252, 251, 251);
+  padding: 8px 15px;
+  font-size: 13px;
+  border-radius: 10px;
+  border: 1px solid #ffffff;
+  width: auto;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.finish:hover {
+  border: 1px solid #045822
 }

@@ -27,7 +27,7 @@ export default function Result() {
           <a className={styles.startBtn}>Retake</a>
         </Link>
       </div>
-      <h2>You answered {correctAnswers} questions correctly. You {correctAnswers > (data.length / 2) ? 'Passed 😃' : 'Failed 🥺'} </h2>
+      <h2>You answered {correctAnswers} questions correctly. You {correctAnswers > ((data.length / 100) * 70) ? 'Passed 😃' : 'Failed 🥺'} </h2>
       <br />
 
       {data.map(quiz => (
