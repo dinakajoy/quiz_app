@@ -5,6 +5,8 @@ import useSWR from "swr";
 import { TSavedAnswer } from "../types/quiz";
 import styles from "../styles/Quiz.module.css";
 
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
+
 export default function Quiz() {
   const router = useRouter();
   const Ref = useRef<NodeJS.Timer | null>(null);
@@ -55,17 +57,29 @@ export default function Quiz() {
     clearTimer(getDeadTime());
   }, []);
 
-  if (timer === "00:00:00") {
-    router.push("/result");
-  }
-
   const [pageIndex, setPageIndex] = useState(0);
   const [answered, setAnswered] = useState<TSavedAnswer>({});
 
-  const fetcher = (url: string) => fetch(url).then((res) => res.json());
-  const { data, error } = useSWR(`./api/quiz?page=${pageIndex}`, fetcher);
+  const { data, error } = useSWR(`/api/quiz?page=${pageIndex}`, fetcher);
 
-  const { quiz, next, prev } = data;
+  if (error) {
+    return (
+      <div className={styles.info}>
+        <h2>{timer}</h2>
+        <h3>Failed to load</h3>
+      </div>
+    );
+  }
+
+  if (!data) {
+    return (
+      <div className={styles.info}>
+        <h2>{timer}</h2>
+        <h3>Loading...</h3>
+      </div>
+    );
+  }
+  const { quiz, next, prev, page, total } = data;
 
   const addAnswer = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
@@ -74,39 +88,36 @@ export default function Quiz() {
     window.localStorage.setItem("quiz", JSON.stringify(latestAnswers));
   };
 
+  if (timer === "00:00:00") {
+    router.push("/result");
+  }
+
   return (
     <>
       <div className={styles.info}>
         <h2>{timer}</h2>
         <p>
-          {parseInt(data.page) + 1} of {data.total}
+          {parseInt(page) + 1} of {total}
         </p>
       </div>
       <div>
-        {error && <h3>Failed to load</h3>}
-        {!data ? (
-          <h3>Loading...</h3>
-        ) : (
-          <>
-            <div key={quiz.id}>
-              <p>{quiz.question}</p>
-            </div>
-            <ul>
-              {quiz.options.map((option: string, i: number) => (
-                <li className={styles.option} key={i}>
-                  <input
-                    type="radio"
-                    name={quiz.id.toString()}
-                    onChange={(e) => addAnswer(e)}
-                    value={option}
-                    checked={answered[quiz.id] === option}
-                  />
-                  {option}
-                </li>
-              ))}
-            </ul>
-          </>
-        )}
+        <div key={quiz.id}>
+          <p>{quiz.question}</p>
+        </div>
+        <ul>
+          {quiz.options.map((option: string, i: number) => (
+            <li className={styles.option} key={i}>
+              <input
+                type="radio"
+                name={quiz.id.toString()}
+                onChange={(e) => addAnswer(e)}
+                value={option}
+                checked={answered[quiz.id] === option}
+              />
+              {option}
+            </li>
+          ))}
+        </ul>
       </div>
       <div className={styles.navBtns}>
         {prev ? (
