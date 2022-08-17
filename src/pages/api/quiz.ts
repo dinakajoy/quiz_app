@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { TQuiz } from '../../types/quiz';
+import { TQuiz, TQuizResponse } from '../../types/quiz';
 
 const questionsAndAnswers: TQuiz[] = [
   {
@@ -130,7 +130,7 @@ interface Params {
 
 export default function handler(
   req: NextApiRequest,
-  res: NextApiResponse<{ prev: boolean, next: boolean, page: string, quiz: TQuiz, total: number } | TQuiz[]>
+  res: NextApiResponse<TQuizResponse>
 ) {
   try {
     let { page } = req.query as unknown as Params;

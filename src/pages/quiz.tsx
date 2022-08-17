@@ -1,16 +1,18 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, ChangeEvent } from "react";
 import useSWR from "swr";
+import { TSavedAnswer } from '../types/quiz';
 import styles from "../styles/Quiz.module.css";
+
 
 export default function Quiz() {
   const router = useRouter();
-  const Ref = useRef(null);
+  const Ref = useRef<NodeJS.Timer | null>(null);
   const [timer, setTimer] = useState("00:10:00");
 
-  const getTimeRemaining = (e) => {
-    const total = Date.parse(e) - Date.parse(new Date());
+  const getTimeRemaining = (e: Date) => {
+    const total = Date.parse(e.toString()) - Date.parse(new Date().toString());
     const seconds = Math.floor((total / 1000) % 60);
     const minutes = Math.floor((total / 1000 / 60) % 60);
     const hours = Math.floor((total / 1000 / 60 / 60) % 24);
@@ -22,7 +24,7 @@ export default function Quiz() {
     };
   };
 
-  const startTimer = (e) => {
+  const startTimer = (e: Date) => {
     let { total, hours, minutes, seconds } = getTimeRemaining(e);
     if (total >= 0) {
       setTimer(
@@ -35,7 +37,7 @@ export default function Quiz() {
     }
   };
 
-  const clearTimer = (e) => {
+  const clearTimer = (e: Date) => {
     setTimer("00:10:00");
     if (Ref.current) clearInterval(Ref.current);
     const id = setInterval(() => {
@@ -44,7 +46,7 @@ export default function Quiz() {
     Ref.current = id;
   };
 
-  const getDeadTime = () => {
+  const getDeadTime: () => Date = () => {
     let deadline = new Date();
     deadline.setSeconds(deadline.getSeconds() + 600);
     return deadline;
@@ -54,10 +56,14 @@ export default function Quiz() {
     clearTimer(getDeadTime());
   }, []);
 
-  const [pageIndex, setPageIndex] = useState(0);
-  const [answered, setAnswered] = useState({});
-  const fetcher = (...args: any) => fetch(...args).then((res) => res.json());
+  if (timer === "00:00:00") {
+    router.push("/result");
+  }
 
+  const [pageIndex, setPageIndex] = useState(0);
+  const [answered, setAnswered] = useState<TSavedAnswer>({});
+
+  const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data, error } = useSWR(
     `http://localhost:3000/api/quiz?page=${pageIndex}`,
     fetcher
@@ -67,16 +73,12 @@ export default function Quiz() {
 
   const { quiz, next, prev } = data;
 
-  const addAnswer = (e: React.FormEvent<HTMLInputElement>): void => {
+  const addAnswer = (e: ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
     const latestAnswers = { ...answered, [name]: value };
     setAnswered(latestAnswers);
     window.localStorage.setItem("quiz", JSON.stringify(latestAnswers));
   };
-
-  if (timer === "00:00:00") {
-    router.push("/result");
-  }
 
   return (
     <>
@@ -96,7 +98,7 @@ export default function Quiz() {
               <input
                 type="radio"
                 name={quiz.id.toString()}
-                onChange={addAnswer}
+                onChange={(e) => addAnswer(e)}
                 value={option}
                 checked={answered[quiz.id] === option}
               />

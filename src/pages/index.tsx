@@ -2,6 +2,7 @@ import Link from 'next/link'
 import styles from '../styles/Home.module.css'
 
 export default function Home() {
+  typeof window !== "undefined" && window.localStorage.setItem("quiz", JSON.stringify({}));
   return (
     <div className={styles.homeWrapper}>
       <p className={styles.description}>Welcome &nbsp; 👋</p>
