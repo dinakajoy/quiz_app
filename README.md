@@ -1,3 +1,5 @@
+# Quiz App
+
 This is a quiz application that test users knowledge on basics of programming, fundamentals of computer science and software engineering.
 It is a timed test and takes ten (10) minutes to complete.
 If user does not complete the questions or user finishes answering the questions and submits, users test score will be returned with answers to the quiz
