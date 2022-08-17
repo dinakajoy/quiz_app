@@ -2,9 +2,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect, useRef, ChangeEvent } from "react";
 import useSWR from "swr";
-import { TSavedAnswer } from '../types/quiz';
+import { TSavedAnswer } from "../types/quiz";
 import styles from "../styles/Quiz.module.css";
-
 
 export default function Quiz() {
   const router = useRouter();
@@ -64,12 +63,7 @@ export default function Quiz() {
   const [answered, setAnswered] = useState<TSavedAnswer>({});
 
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
-  const { data, error } = useSWR(
-    `./api/quiz?page=${pageIndex}`,
-    fetcher
-  );
-  if (error) return <div>Failed to load</div>;
-  if (!data) return <div>loading...</div>;
+  const { data, error } = useSWR(`./api/quiz?page=${pageIndex}`, fetcher);
 
   const { quiz, next, prev } = data;
 
@@ -89,23 +83,30 @@ export default function Quiz() {
         </p>
       </div>
       <div>
-        <div key={quiz.id}>
-          <p>{quiz.question}</p>
-        </div>
-        <ul>
-          {quiz.options.map((option: string, i: number) => (
-            <li className={styles.option} key={i}>
-              <input
-                type="radio"
-                name={quiz.id.toString()}
-                onChange={(e) => addAnswer(e)}
-                value={option}
-                checked={answered[quiz.id] === option}
-              />
-              {option}
-            </li>
-          ))}
-        </ul>
+        {error && <h3>Failed to load</h3>}
+        {!data ? (
+          <h3>Loading...</h3>
+        ) : (
+          <>
+            <div key={quiz.id}>
+              <p>{quiz.question}</p>
+            </div>
+            <ul>
+              {quiz.options.map((option: string, i: number) => (
+                <li className={styles.option} key={i}>
+                  <input
+                    type="radio"
+                    name={quiz.id.toString()}
+                    onChange={(e) => addAnswer(e)}
+                    value={option}
+                    checked={answered[quiz.id] === option}
+                  />
+                  {option}
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
       </div>
       <div className={styles.navBtns}>
         {prev ? (
