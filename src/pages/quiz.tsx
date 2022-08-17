@@ -65,10 +65,10 @@ export default function Quiz() {
 
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data, error } = useSWR(
-    `http://localhost:3000/api/quiz?page=${pageIndex}`,
+    `./api/quiz?page=${pageIndex}`,
     fetcher
   );
-  if (error) return <div>failed to load</div>;
+  if (error) return <div>Failed to load</div>;
   if (!data) return <div>loading...</div>;
 
   const { quiz, next, prev } = data;
