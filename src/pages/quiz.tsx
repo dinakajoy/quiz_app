@@ -107,15 +107,16 @@ export default function Quiz() {
         <ul>
           {quiz.options.map((option: string, i: number) => (
             <li className={styles.option} key={i}>
-              <input
-                type="radio"
-                name={quiz.id.toString()}
-                onChange={(e) => addAnswer(e)}
-                value={option}
-                checked={answered[quiz.id] === option}
-              />
-              {option}
-            </li>
+            <input
+              type="radio"
+              id={`quiz-${quiz.id}-option-${i}`}
+              name={quiz.id.toString()}
+              onChange={(e) => addAnswer(e)}
+              value={option}
+              checked={answered[quiz.id] === option}
+            />
+            <label htmlFor={`quiz-${quiz.id}-option-${i}`}>{option}</label>
+          </li>
           ))}
         </ul>
       </div>
